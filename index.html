@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudDeck - AWS Cloud Practitioner 学習カード</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Amazon Ember', 'Helvetica Neue', Roboto, Arial, sans-serif;
+            background: #232f3e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            padding: 40px;
+            position: relative;
+            border-top: 4px solid #ff9900;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #232f3e;
+            margin-bottom: 8px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .logo {
+            color: #232f3e;
+        }
+
+        .logo-accent {
+            color: #ff9900;
+        }
+
+        .subtitle {
+            color: #879196;
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .stats {
+            text-align: center;
+            color: #879196;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            background: #e9ecef;
+            border-radius: 4px;
+            height: 6px;
+            margin: 20px 0 30px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #ff9900;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .card-info {
+            text-align: center;
+            color: #879196;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .flashcard {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
+            padding: 40px;
+            min-height: 350px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flashcard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .flashcard::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #ff9900;
+        }
+
+        .card-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 270px;
+        }
+
+        .service-name {
+            font-size: 1.75rem;
+            color: #232f3e;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .service-category {
+            font-size: 0.75rem;
+            color: #ff9900;
+            margin-top: 10px;
+            padding: 4px 12px;
+            background: rgba(255, 153, 0, 0.1);
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+
+        .card-back {
+            display: none;
+            max-height: 350px;
+            overflow-y: auto;
+            padding-right: 10px;
+            line-height: 1.6;
+            color: #232f3e;
+        }
+
+        .card-back::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-back::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .card-back::-webkit-scrollbar-thumb {
+            background: #ff6b35;
+            border-radius: 3px;
+        }
+
+        .card-back h3 {
+            color: #232f3e;
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .card-back p {
+            color: #545b64;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .card-back ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .card-back li {
+            color: #545b64;
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .card-back li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #ff9900;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            color: #879196;
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            background: #232f3e;
+        }
+
+        .btn-prev, .btn-next {
+            background: #ff9900;
+        }
+
+        .btn-prev:hover, .btn-next:hover {
+            background: #e88900;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn-prev:disabled, .btn-next:disabled {
+            background: #d5dbdb;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-shuffle {
+            background: #146eb4;
+            flex-grow: 1;
+            max-width: 200px;
+        }
+
+        .btn-shuffle:hover {
+            background: #0073bb;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(20, 110, 180, 0.3);
+        }
+
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filters select {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #d5dbdb;
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: white;
+            color: #232f3e;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .filters select:hover {
+            border-color: #ff9900;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 1px solid #d5dbdb;
+            border-radius: 4px;
+            padding: 8px 16px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box:hover {
+            border-color: #ff9900;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 4px;
+            font-size: 0.875rem;
+            width: 200px;
+            color: #232f3e;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px;
+            }
+
+            .service-name {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .btn-shuffle {
+                order: -1;
+                max-width: none;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .search-box input {
+                width: 150px;
+            }
+        }
+
+        .flipped .card-front {
+            display: none;
+        }
+
+        .flipped .card-back {
+            display: block;
+        }
+
+        .flipped .click-hint {
+            display: none;
+        }
+
+        .keyboard-hint {
+            text-align: center;
+            color: #879196;
+            font-size: 0.75rem;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="logo">Cloud</span><span class="logo-accent">Deck</span></h1>
+            <p class="subtitle">AWS Cloud Practitioner 学習カード</p>
+        </div>
+        <div class="stats">全<span id="totalServicesCount">120</span>サービス収録</div>
+        
+        <div class="filters">
+            <select id="categorySelect">
+                <option value="all">すべてのカテゴリ</option>
+                <option value="analytics">分析</option>
+                <option value="app-integration">アプリケーション統合</option>
+                <option value="business-apps">ビジネスアプリケーション</option>
+                <option value="cloud-financial">クラウド財務管理</option>
+                <option value="compute">コンピューティング</option>
+                <option value="containers">コンテナ</option>
+                <option value="customer-enablement">カスタマーイネーブルメント</option>
+                <option value="database">データベース</option>
+                <option value="developer">デベロッパーツール</option>
+                <option value="end-user">エンドユーザーコンピューティング</option>
+                <option value="frontend">フロントエンドウェブとモバイル</option>
+                <option value="iot">IoT</option>
+                <option value="ml">機械学習</option>
+                <option value="management">マネジメントとガバナンス</option>
+                <option value="migration">移行と転送</option>
+                <option value="network">ネットワークとコンテンツ配信</option>
+                <option value="security">セキュリティ</option>
+                <option value="serverless">サーバーレス</option>
+                <option value="storage">ストレージ</option>
+                <option value="concepts">クラウドの概念</option>
+            </select>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="サービスを検索...">
+            </div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="card-info">
+            <span id="cardNumber">1</span> / <span id="totalCards">120</span>
+        </div>
+        
+        <div class="flashcard" id="flashcard">
+            <div class="card-front">
+                <h2 class="service-name" id="serviceName">Amazon EC2</h2>
+                <div class="service-category" id="serviceCategory">コンピューティング</div>
+            </div>
+            <div class="card-back" id="cardBack">
+                <h3>Amazon Elastic Compute Cloud (EC2)</h3>
+                <p>仮想サーバーを提供するサービスで、必要に応じてコンピューティングキャパシティを拡張・縮小できます。</p>
+                <ul>
+                    <li>オンデマンドでスケーラブルな計算能力</li>
+                    <li>様々なインスタンスタイプ（汎用、コンピューティング最適化、メモリ最適化など）</li>
+                    <li>秒単位の課金（最小1分）</li>
+                    <li>複数の料金モデル（オンデマンド、リザーブド、スポット、Savings Plans）</li>
+                </ul>
+            </div>
+            <span class="click-hint">クリックして詳細を表示</span>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-prev" id="prevBtn" disabled>前へ</button>
+            <button class="btn btn-shuffle" id="shuffleBtn">シャッフル</button>
+            <button class="btn btn-next" id="nextBtn">次へ</button>
+        </div>
+        
+        <div class="keyboard-hint">
+            キーボード: ← → で移動、スペースでカードをめくる
+        </div>
+    </div>
+
+    <script>
+        const cards = [
+            // 分析
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon Athena',
+                title: 'Amazon Athena',
+                description: 'S3内のデータを標準SQLで分析できるインタラクティブクエリサービス。',
+                details: [
+                    'サーバーレスでインフラ管理不要',
+                    'スキャンしたデータ量に基づく課金',
+                    'CSV、JSON、ORC、Parquet、Avro形式をサポート',
+                    'AWS Glueデータカタログとの統合',
+                    'QuickSightやその他のBIツールとの連携'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon EMR',
+                title: 'Amazon Elastic MapReduce (EMR)',
+                description: 'ビッグデータフレームワークを実行するためのマネージドクラスターサービス。',
+                details: [
+                    'Apache Spark、Hadoop、HBase、Presto、Flinkをサポート',
+                    'ペタバイト規模のデータ分析',
+                    'EC2インスタンスの自動プロビジョニングと管理',
+                    'S3との密な統合',
+                    '秒単位の課金'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'AWS Glue',
+                title: 'AWS Glue',
+                description: 'フルマネージドETL（抽出、変換、ロード）サービス。',
+                details: [
+                    'データカタログによるメタデータの管理',
+                    'ビジュアルETLジョブの作成',
+                    'サーバーレスでインフラ管理不要',
+                    'Python/Scalaでのカスタムスクリプト',
+                    '自動スキーマ検出'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon Kinesis',
+                title: 'Amazon Kinesis',
+                description: 'リアルタイムデータストリーミングサービス。',
+                details: [
+                    'Kinesis Data Streams：リアルタイムデータの収集と処理',
+                    'Kinesis Data Firehose：データの配信',
+                    'Kinesis Data Analytics：SQLでのストリーム分析',
+                    'Kinesis Video Streams：動画ストリーミング',
+                    '大規模データの低レイテンシー処理'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon OpenSearch Service',
+                title: 'Amazon OpenSearch Service',
+                description: 'オープンソースの検索・分析エンジンのマネージドサービス。',
+                details: [
+                    '旧Amazon Elasticsearch Service',
+                    'ログ分析、フルテキスト検索、アプリケーションモニタリング',
+                    'OpenSearch DashboardsによるII可視化',
+                    '自動バックアップとレプリケーション',
+                    'きめ細かなアクセス制御'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon QuickSight',
+                title: 'Amazon QuickSight',
+                description: 'サーバーレスのビジネスインテリジェンス（BI）サービス。',
+                details: [
+                    'インタラクティブなダッシュボードの作成',
+                    '機械学習による異常検出と予測',
+                    'SPICE（Super-fast, Parallel, In-memory Calculation Engine）',
+                    '従量課金制（セッション単位）',
+                    'モバイルアプリでのアクセス'
+                ]
+            },
+            {
+                category: 'analytics',
+                categoryName: '分析',
+                name: 'Amazon Redshift',
+                title: 'Amazon Redshift',
+                description: 'ペタバイト規模のデータウェアハウスサービス。',
+                details: [
+                    '列指向ストレージとMPP（大規模並列処理）',
+                    'S3データレイクへの直接クエリ（Redshift Spectrum）',
+                    '自動バックアップとスナップショット',
+                    'コンカレンシースケーリング',
+                    'RA3インスタンスによるコンピュートとストレージの分離'
+                ]
+            },
+
+            // アプリケーション統合
+            {
+                category: 'app-integration',
+                categoryName: 'アプリケーション統合',
+                name: 'Amazon EventBridge',
+                title: 'Amazon EventBridge',
+                description: 'サーバーレスイベントバスサービス。',
+                details: [
+                    'アプリケーション間のイベントドリブンアーキテクチャ',
+                    'SaaSアプリケーションとの統合',
+                    'イベントのフィルタリングとルーティング',
+                    'スケジュール実行',
+                    'イベントのアーカイブとリプレイ'
+                ]
+            },
+            {
+                category: 'app-integration',
+                categoryName: 'アプリケーション統合',
+                name: 'Amazon SNS',
+                title: 'Amazon Simple Notification Service (SNS)',
+                description: 'フルマネージドのパブリッシュ/サブスクライブメッセージングサービス。',
+                details: [
+                    'プッシュ通知（SMS、メール、モバイルプッシュ）',
+                    'ファンアウトメッセージング',
+                    'メッセージフィルタリング',
+                    'デッドレターキュー',
+                    'FIFOトピックによる順序保証'
+                ]
+            },
+            {
+                category: 'app-integration',
+                categoryName: 'アプリケーション統合',
+                name: 'Amazon SQS',
+                title: 'Amazon Simple Queue Service (SQS)',
+                description: 'フルマネージドメッセージキューイングサービス。',
+                details: [
+                    'アプリケーションコンポーネントの分離',
+                    '標準キューとFIFOキュー',
+                    'メッセージの自動削除',
+                    'デッドレターキュー',
+                    '無制限のスループット'
+                ]
+            },
+            {
+                category: 'app-integration',
+                categoryName: 'アプリケーション統合',
+                name: 'AWS Step Functions',
+                title: 'AWS Step Functions',
+                description: 'ビジュアルワークフローを使用して分散アプリケーションを調整するサービス。',
+                details: [
+                    'ステートマシンによるワークフロー定義',
+                    'ビジュアルワークフローデザイナー',
+                    'エラーハンドリングとリトライ',
+                    'Express WorkflowsとStandard Workflows',
+                    'サーバーレスオーケストレーション'
+                ]
+            },
+
+            // ビジネスアプリケーション
+            {
+                category: 'business-apps',
+                categoryName: 'ビジネスアプリケーション',
+                name: 'Amazon Connect',
+                title: 'Amazon Connect',
+                description: 'クラウドベースのコンタクトセンターサービス。',
+                details: [
+                    'セルフサービスでの設定',
+                    'オムニチャネル対応（音声、チャット）',
+                    'AIを活用した通話分析',
+                    '使用した分だけの従量課金',
+                    'CRMとの統合'
+                ]
+            },
+            {
+                category: 'business-apps',
+                categoryName: 'ビジネスアプリケーション',
+                name: 'Amazon SES',
+                title: 'Amazon Simple Email Service (SES)',
+                description: '大規模なメール送信サービス。',
+                details: [
+                    'トランザクションメールとマーケティングメール',
+                    '高い配信率',
+                    'メール受信とフィルタリング',
+                    'レピュテーション管理',
+                    'DKIM、SPF、DMARC対応'
+                ]
+            },
+
+            // クラウド財務管理
+            {
+                category: 'cloud-financial',
+                categoryName: 'クラウド財務管理',
+                name: 'AWS Budgets',
+                title: 'AWS Budgets',
+                description: 'カスタム予算を設定して、コストと使用量を追跡するサービス。',
+                details: [
+                    'コスト、使用量、RIカバレッジの予算設定',
+                    'アラート通知',
+                    '予算対実績のモニタリング',
+                    'アクションの自動実行',
+                    '最大5つの予算まで無料'
+                ]
+            },
+            {
+                category: 'cloud-financial',
+                categoryName: 'クラウド財務管理',
+                name: 'AWS Cost and Usage Reports',
+                title: 'AWS Cost and Usage Reports',
+                description: '詳細な請求レポートを提供するサービス。',
+                details: [
+                    '時間単位、日単位の詳細データ',
+                    'リソースIDレベルの情報',
+                    'S3への自動配信',
+                    'Athena、QuickSightとの統合',
+                    'コスト配分タグの活用'
+                ]
+            },
+            {
+                category: 'cloud-financial',
+                categoryName: 'クラウド財務管理',
+                name: 'AWS Cost Explorer',
+                title: 'AWS Cost Explorer',
+                description: 'コストと使用量を視覚化し、分析するツール。',
+                details: [
+                    '過去12か月のデータ表示',
+                    '将来3か月のコスト予測',
+                    'フィルタリングとグループ化',
+                    'カスタムレポートの作成',
+                    'RIとSavings Plansの推奨'
+                ]
+            },
+            {
+                category: 'cloud-financial',
+                categoryName: 'クラウド財務管理',
+                name: 'AWS Marketplace',
+                title: 'AWS Marketplace',
+                description: 'サードパーティーソフトウェアとサービスのデジタルカタログ。',
+                details: [
+                    'ワンクリックデプロイ',
+                    'ソフトウェアとデータ製品',
+                    'SaaS、AMI、コンテナ製品',
+                    '統合請求',
+                    '無料試用版の提供'
+                ]
+            },
+
+            // コンピューティング
+            {
+                category: 'compute',
+                categoryName: 'コンピューティング',
+                name: 'AWS Batch',
+                title: 'AWS Batch',
+                description: 'バッチコンピューティングジョブを効率的に実行するサービス。',
+                details: [
+                    'ジョブキューとコンピュート環境の管理',
+                    'EC2とFargateでの実行',
+                    'ジョブの依存関係管理',
+                    '自動リソーススケーリング',
+                    'スポットインスタンスの活用'
+                ]
+            },
+            {
+                category: 'compute',
+                categoryName: 'コンピューティング',
+                name: 'Amazon EC2',
+                title: 'Amazon Elastic Compute Cloud (EC2)',
+                description: '仮想サーバーを提供するサービス。',
+                details: [
+                    'オンデマンドでスケーラブルな計算能力',
+                    '様々なインスタンスタイプ',
+                    '秒単位の課金（最小60秒）',
+                    '複数の料金モデル',
+                    'ユーザーデータとメタデータサービス'
+                ]
+            },
+            {
+                category: 'compute',
+                categoryName: 'コンピューティング',
+                name: 'AWS Elastic Beanstalk',
+                title: 'AWS Elastic Beanstalk',
+                description: 'ウェブアプリケーションとサービスをデプロイおよび管理するためのサービス。',
+                details: [
+                    'コードをアップロードするだけでデプロイ',
+                    '多言語サポート（Java、.NET、PHP、Node.js、Python、Ruby、Go、Docker）',
+                    '自動スケーリングとロードバランシング',
+                    'ヘルスモニタリング',
+                    '設定のバージョン管理'
+                ]
+            },
+            {
+                category: 'compute',
+                categoryName: 'コンピューティング',
+                name: 'Amazon Lightsail',
+                title: 'Amazon Lightsail',
+                description: '仮想プライベートサーバーを簡単に起動できるサービス。',
+                details: [
+                    '予測可能な月額固定料金',
+                    'プリインストールされたアプリケーション',
+                    'シンプルな管理コンソール',
+                    'スナップショットとバックアップ',
+                    'ロードバランサーとDNS管理'
+                ]
+            },
+            {
+                category: 'compute',
+                categoryName: 'コンピューティング',
+                name: 'AWS Outposts',
+                title: 'AWS Outposts',
+                description: 'AWSのインフラストラクチャとサービスをオンプレミスに拡張。',
+                details: [
+                    '完全マネージドサービス',
+                    'ローカルでのEC2、EBS、S3の実行',
+                    '低レイテンシーアプリケーション',
+                    'ローカルデータ処理',
+                    'ハイブリッドクラウドアーキテクチャ'
+                ]
+            },
+
+            // コンテナ
+            {
+                category: 'containers',
+                categoryName: 'コンテナ',
+                name: 'Amazon ECR',
+                title: 'Amazon Elastic Container Registry (ECR)',
+                description: 'フルマネージドDockerコンテナレジストリ。',
+                details: [
+                    'プライベートリポジトリ',
+                    'イメージスキャニング',
+                    'ライフサイクルポリシー',
+                    'IAMベースのアクセス制御',
+                    'クロスリージョンレプリケーション'
+                ]
+            },
+            {
+                category: 'containers',
+                categoryName: 'コンテナ',
+                name: 'Amazon ECS',
+                title: 'Amazon Elastic Container Service (ECS)',
+                description: 'フルマネージドコンテナオーケストレーションサービス。',
+                details: [
+                    'Dockerコンテナの実行と管理',
+                    'EC2とFargateでの実行',
+                    'サービスディスカバリー',
+                    'タスク定義とサービス',
+                    'Application Load Balancerとの統合'
+                ]
+            },
+            {
+                category: 'containers',
+                categoryName: 'コンテナ',
+                name: 'Amazon EKS',
+                title: 'Amazon Elastic Kubernetes Service (EKS)',
+                description: 'マネージドKubernetesサービス。',
+                details: [
+                    '認定Kubernetesコンフォーマント',
+                    'コントロールプレーンの管理',
+                    'EC2、Fargate、またはEKS Anywhereでの実行',
+                    'アドオンの管理',
+                    'IAMとの統合（IRSA）'
+                ]
+            },
+
+            // カスタマーイネーブルメント
+            {
+                category: 'customer-enablement',
+                categoryName: 'カスタマーイネーブルメント',
+                name: 'AWS Support',
+                title: 'AWS Support',
+                description: 'AWSの技術サポートサービス。',
+                details: [
+                    'ベーシック（無料）：ドキュメントとフォーラム',
+                    'デベロッパー：営業時間内の技術サポート',
+                    'ビジネス：24時間365日サポート、Trusted Advisor全機能',
+                    'エンタープライズOn-Ramp：プール型TAM',
+                    'エンタープライズ：専任TAM、プロアクティブサポート'
+                ]
+            },
+
+            // データベース
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon Aurora',
+                title: 'Amazon Aurora',
+                description: 'MySQL/PostgreSQL互換のクラウドネイティブリレーショナルデータベース。',
+                details: [
+                    '商用データベースの性能、オープンソースの価格',
+                    '最大15個のリードレプリカ',
+                    '自動フェイルオーバー（通常30秒未満）',
+                    'Aurora Serverlessによる自動スケーリング',
+                    'グローバルデータベース'
+                ]
+            },
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon DocumentDB',
+                title: 'Amazon DocumentDB',
+                description: 'MongoDB互換のドキュメントデータベースサービス。',
+                details: [
+                    'MongoDBワークロードのサポート',
+                    'ストレージの自動スケーリング（最大64TB）',
+                    '99.99%の可用性SLA',
+                    '最大15個のリードレプリカ',
+                    'ポイントインタイムリカバリ'
+                ]
+            },
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon DynamoDB',
+                title: 'Amazon DynamoDB',
+                description: 'フルマネージドNoSQLデータベースサービス。',
+                details: [
+                    'ミリ秒単位のレイテンシー',
+                    'オンデマンドとプロビジョニング済みキャパシティ',
+                    'グローバルテーブル',
+                    'ポイントインタイムリカバリ',
+                    'DynamoDB Streamsによる変更データキャプチャ'
+                ]
+            },
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon ElastiCache',
+                title: 'Amazon ElastiCache',
+                description: 'インメモリキャッシングサービス。',
+                details: [
+                    'RedisとMemcachedエンジン',
+                    'ミリ秒未満のレイテンシー',
+                    'クラスターモードとレプリケーション',
+                    '自動フェイルオーバー',
+                    'バックアップと復元'
+                ]
+            },
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon Neptune',
+                title: 'Amazon Neptune',
+                description: 'フルマネージドグラフデータベースサービス。',
+                details: [
+                    'Property GraphとRDFモデル',
+                    'Gremlin、SPARQL、openCypherクエリ言語',
+                    '高可用性（3つのAZにレプリカ）',
+                    '暗号化とコンプライアンス',
+                    'グラフ分析とML統合'
+                ]
+            },
+            {
+                category: 'database',
+                categoryName: 'データベース',
+                name: 'Amazon RDS',
+                title: 'Amazon Relational Database Service (RDS)',
+                description: 'マネージドリレーショナルデータベースサービス。',
+                details: [
+                    'MySQL、PostgreSQL、MariaDB、Oracle、SQL Server、Db2',
+                    '自動バックアップとスナップショット',
+                    'マルチAZデプロイ',
+                    'リードレプリカ',
+                    'Performance InsightsとEnhanced Monitoring'
+                ]
+            },
+
+            // デベロッパーツール
+            {
+                category: 'developer',
+                categoryName: 'デベロッパーツール',
+                name: 'AWS CLI',
+                title: 'AWS Command Line Interface (CLI)',
+                description: 'AWSサービスを管理するための統一ツール。',
+                details: [
+                    'すべてのAWSサービスへのアクセス',
+                    'スクリプトによる自動化',
+                    'マルチプラットフォーム対応',
+                    'プロファイルによる認証情報管理',
+                    'JSONやテーブル形式での出力'
+                ]
+            },
+            {
+                category: 'developer',
+                categoryName: 'デベロッパーツール',
+                name: 'AWS CodeBuild',
+                title: 'AWS CodeBuild',
+                description: 'フルマネージドビルドサービス。',
+                details: [
+                    'ソースコードのコンパイル',
+                    'テストの実行',
+                    'デプロイ可能なアーティファクトの生成',
+                    'ビルド時間に基づく課金',
+                    'カスタムビルド環境'
+                ]
+            },
+            {
+                category: 'developer',
+                categoryName: 'デベロッパーツール',
+                name: 'AWS CodePipeline',
+                title: 'AWS CodePipeline',
+                description: '継続的デリバリーサービス。',
+                details: [
+                    'リリースパイプラインの自動化',
+                    'ソース、ビルド、テスト、デプロイステージ',
+                    '並列実行と承認アクション',
+                    'サードパーティツールとの統合',
+                    'パイプラインの可視化'
+                ]
+            },
+            {
+                category: 'developer',
+                categoryName: 'デベロッパーツール',
+                name: 'AWS X-Ray',
+                title: 'AWS X-Ray',
+                description: '分散アプリケーションの分析とデバッグツール。',
+                details: [
+                    'リクエストトレーシング',
+                    'サービスマップの生成',
+                    'パフォーマンスボトルネックの特定',
+                    'エラーと例外の分析',
+                    'Lambda、EC2、ECSとの統合'
+                ]
+            },
+
+            // エンドユーザーコンピューティング
+            {
+                category: 'end-user',
+                categoryName: 'エンドユーザーコンピューティング',
+                name: 'Amazon AppStream 2.0',
+                title: 'Amazon AppStream 2.0',
+                description: 'デスクトップアプリケーションをブラウザにストリーミング。',
+                details: [
+                    'アプリケーションの即時アクセス',
+                    'どのデバイスからでもアクセス可能',
+                    'セッション単位の課金',
+                    '永続ストレージ',
+                    'SAMLベースのシングルサインオン'
+                ]
+            },
+            {
+                category: 'end-user',
+                categoryName: 'エンドユーザーコンピューティング',
+                name: 'Amazon WorkSpaces',
+                title: 'Amazon WorkSpaces',
+                description: 'マネージド仮想デスクトップサービス。',
+                details: [
+                    'Windows/Linux/Ubuntu デスクトップ',
+                    '月額または時間単位の課金',
+                    '永続的なストレージ',
+                    'AD統合',
+                    'どこからでもアクセス可能'
+                ]
+            },
+            {
+                category: 'end-user',
+                categoryName: 'エンドユーザーコンピューティング',
+                name: 'WorkSpaces Secure Browser',
+                title: 'Amazon WorkSpaces Secure Browser',
+                description: 'セキュアなブラウザサービス。',
+                details: [
+                    'ウェブベースのワークロードへの安全なアクセス',
+                    'ローカルデバイスへのデータ転送を防止',
+                    'プライベートネットワークリソースへのアクセス',
+                    'セッションの記録と監査',
+                    'SAML 2.0認証'
+                ]
+            },
+
+            // フロントエンドウェブとモバイル
+            {
+                category: 'frontend',
+                categoryName: 'フロントエンドウェブとモバイル',
+                name: 'AWS Amplify',
+                title: 'AWS Amplify',
+                description: 'モバイルおよびウェブアプリケーションの開発プラットフォーム。',
+                details: [
+                    'フルスタックアプリケーションの構築',
+                    'ホスティング、認証、API、ストレージ',
+                    'フロントエンドフレームワークとの統合',
+                    'CI/CDパイプライン',
+                    'リアルタイムデータ同期'
+                ]
+            },
+            {
+                category: 'frontend',
+                categoryName: 'フロントエンドウェブとモバイル',
+                name: 'AWS AppSync',
+                title: 'AWS AppSync',
+                description: 'マネージドGraphQLサービス。',
+                details: [
+                    'リアルタイムデータ同期',
+                    'オフラインデータアクセス',
+                    '複数のデータソースとの統合',
+                    'きめ細かなアクセス制御',
+                    'サブスクリプションによるリアルタイム更新'
+                ]
+            },
+
+            // IoT
+            {
+                category: 'iot',
+                categoryName: 'IoT',
+                name: 'AWS IoT Core',
+                title: 'AWS IoT Core',
+                description: 'IoTデバイスをクラウドに接続するマネージドサービス。',
+                details: [
+                    '数十億のデバイスと数兆のメッセージをサポート',
+                    'MQTT、HTTPS、WebSocketプロトコル',
+                    'デバイスシャドウ',
+                    'ルールエンジンによるデータ処理',
+                    'セキュアな認証と暗号化'
+                ]
+            },
+
+            // 機械学習
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Comprehend',
+                title: 'Amazon Comprehend',
+                description: '自然言語処理（NLP）サービス。',
+                details: [
+                    'テキストからの洞察抽出',
+                    '感情分析',
+                    'エンティティ認識',
+                    'キーフレーズ抽出',
+                    'カスタムエンティティ認識'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Kendra',
+                title: 'Amazon Kendra',
+                description: '機械学習を活用したエンタープライズ検索サービス。',
+                details: [
+                    '自然言語クエリ',
+                    '関連性の高い回答',
+                    '複数のデータソースとコネクタ',
+                    'ドキュメントのランキング',
+                    'アクセス制御とセキュリティ'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Lex',
+                title: 'Amazon Lex',
+                description: '会話型インターフェイスを構築するサービス。',
+                details: [
+                    'Alexaと同じ技術',
+                    '音声とテキストのチャットボット',
+                    '自然言語理解（NLU）',
+                    'マルチターン会話',
+                    'Lambda関数との統合'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Polly',
+                title: 'Amazon Polly',
+                description: 'テキストを音声に変換するサービス。',
+                details: [
+                    '数十の言語と音声',
+                    'ニューラル音声オプション',
+                    'SSMLサポート',
+                    '音声ファイルの保存',
+                    'リアルタイムストリーミング'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Q',
+                title: 'Amazon Q',
+                description: 'ビジネス向けの生成AIアシスタント。',
+                details: [
+                    '企業データに基づく回答生成',
+                    'カスタマイズ可能',
+                    'セキュアなデータアクセス',
+                    'コード生成と分析',
+                    'ビジネスアプリケーションとの統合'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Rekognition',
+                title: 'Amazon Rekognition',
+                description: '画像・動画分析サービス。',
+                details: [
+                    '物体、シーン、アクティビティの検出',
+                    '顔認識と分析',
+                    'テキスト検出',
+                    'コンテンツモデレーション',
+                    'カスタムラベル'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon SageMaker',
+                title: 'Amazon SageMaker',
+                description: '機械学習モデルの構築、トレーニング、デプロイのためのフルマネージドサービス。',
+                details: [
+                    'Jupyter Notebookの統合開発環境',
+                    '組み込みアルゴリズム',
+                    '分散トレーニング',
+                    'モデルのホスティングと推論',
+                    'AutoMLとハイパーパラメータ調整'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Textract',
+                title: 'Amazon Textract',
+                description: 'ドキュメントからテキストとデータを抽出するサービス。',
+                details: [
+                    'テキスト、フォーム、テーブルの抽出',
+                    'PDFとイメージファイルのサポート',
+                    '手書き文字の認識',
+                    '構造化データの抽出',
+                    'IDドキュメントの処理'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Transcribe',
+                title: 'Amazon Transcribe',
+                description: '音声をテキストに変換する自動音声認識（ASR）サービス。',
+                details: [
+                    'リアルタイムとバッチ処理',
+                    '複数話者の識別',
+                    'カスタム語彙',
+                    'タイムスタンプ',
+                    '医療向けTranscribe Medical'
+                ]
+            },
+            {
+                category: 'ml',
+                categoryName: '機械学習',
+                name: 'Amazon Translate',
+                title: 'Amazon Translate',
+                description: 'ニューラル機械翻訳サービス。',
+                details: [
+                    '75以上の言語',
+                    'リアルタイム翻訳',
+                    'バッチ翻訳',
+                    'カスタム用語集',
+                    'ドキュメント翻訳'
+                ]
+            },
+
+            // マネジメントとガバナンス
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Auto Scaling',
+                title: 'AWS Auto Scaling',
+                description: 'アプリケーションのスケーリングを自動化。',
+                details: [
+                    '複数のリソースタイプのスケーリング',
+                    'ターゲット追跡スケーリング',
+                    '予測スケーリング',
+                    'スケジュールスケーリング',
+                    'ヘルスチェックと置き換え'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS CloudFormation',
+                title: 'AWS CloudFormation',
+                description: 'Infrastructure as Code（IaC）サービス。',
+                details: [
+                    'テンプレートによるリソース管理',
+                    'スタックの作成と更新',
+                    'ドリフト検出',
+                    '変更セット',
+                    'クロスリージョンとクロスアカウント'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS CloudTrail',
+                title: 'AWS CloudTrail',
+                description: 'AWSアカウントのガバナンス、コンプライアンス、運用監査。',
+                details: [
+                    'APIコールの記録',
+                    'イベント履歴',
+                    'ログファイルの暗号化',
+                    'ログファイル整合性検証',
+                    'EventBridgeとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'Amazon CloudWatch',
+                title: 'Amazon CloudWatch',
+                description: 'AWSリソースとアプリケーションのモニタリング。',
+                details: [
+                    'メトリクスの収集',
+                    'ログの管理（CloudWatch Logs）',
+                    'アラームとアクション',
+                    'ダッシュボード',
+                    'イベントとルール'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Compute Optimizer',
+                title: 'AWS Compute Optimizer',
+                description: 'リソースの最適化推奨を提供。',
+                details: [
+                    'EC2インスタンスの適正サイズ',
+                    'EBSボリュームの最適化',
+                    'Lambda関数の設定推奨',
+                    'コスト削減の見積もり',
+                    '機械学習による分析'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Config',
+                title: 'AWS Config',
+                description: 'リソース設定の評価、監査、審査。',
+                details: [
+                    '設定変更の追跡',
+                    'コンプライアンスルール',
+                    '設定スナップショット',
+                    'リソース関係の可視化',
+                    '修復アクション'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Control Tower',
+                title: 'AWS Control Tower',
+                description: 'マルチアカウント環境の設定と管理。',
+                details: [
+                    'ランディングゾーンの自動設定',
+                    'ガードレール（予防的・発見的）',
+                    'アカウントファクトリー',
+                    'ダッシュボードによる可視化',
+                    'AWS Organizationsとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Health Dashboard',
+                title: 'AWS Health Dashboard',
+                description: 'AWSサービスの状態とアカウント固有の情報を提供。',
+                details: [
+                    'サービスヘルス',
+                    'アカウント固有のイベント',
+                    '計画されたメンテナンス',
+                    'Health APIによるプログラムアクセス',
+                    'CloudWatchイベントとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS License Manager',
+                title: 'AWS License Manager',
+                description: 'ソフトウェアライセンスの管理。',
+                details: [
+                    'ライセンスの追跡と管理',
+                    'ライセンスルールの設定',
+                    'ライセンス使用状況のレポート',
+                    'ライセンスのコンプライアンス',
+                    'AWS Marketplaceとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Management Console',
+                title: 'AWS Management Console',
+                description: 'AWSサービスを管理するウェブベースのインターフェイス。',
+                details: [
+                    'ブラウザベースのアクセス',
+                    'モバイルアプリ',
+                    'リソースグループ',
+                    'タグエディター',
+                    'お気に入りとショートカット'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Organizations',
+                title: 'AWS Organizations',
+                description: '複数のAWSアカウントの一元管理。',
+                details: [
+                    '組織単位（OU）による階層構造',
+                    '一括請求',
+                    'サービスコントロールポリシー（SCP）',
+                    'アカウントの作成と管理',
+                    'AWS SSOとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Service Catalog',
+                title: 'AWS Service Catalog',
+                description: '承認されたITサービスのカタログ管理。',
+                details: [
+                    '製品ポートフォリオ',
+                    'バージョン管理',
+                    'アクセス制御',
+                    '制約の設定',
+                    'セルフサービスプロビジョニング'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'Service Quotas',
+                title: 'Service Quotas',
+                description: 'AWSサービスのクォータ（制限）を管理。',
+                details: [
+                    'クォータの表示',
+                    '引き上げリクエスト',
+                    'CloudWatchアラームの設定',
+                    'クォータ使用率の追跡',
+                    'AWS Organizationsとの統合'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Systems Manager',
+                title: 'AWS Systems Manager',
+                description: 'インフラストラクチャの表示と制御。',
+                details: [
+                    'Run Command：リモートコマンド実行',
+                    'Session Manager：セキュアなシェルアクセス',
+                    'Parameter Store：設定データの管理',
+                    'Patch Manager：パッチ管理',
+                    'Automation：運用タスクの自動化'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'AWS Trusted Advisor',
+                title: 'AWS Trusted Advisor',
+                description: 'ベストプラクティスに基づく推奨事項を提供。',
+                details: [
+                    'コスト最適化',
+                    'セキュリティ',
+                    'フォルトトレランス',
+                    'パフォーマンス',
+                    'サービス制限'
+                ]
+            },
+            {
+                category: 'management',
+                categoryName: 'マネジメントとガバナンス',
+                name: 'Well-Architected Tool',
+                title: 'AWS Well-Architected Tool',
+                description: 'アーキテクチャのレビューと改善。',
+                details: [
+                    'ワークロードのレビュー',
+                    '6つの柱に基づく評価',
+                    '改善計画',
+                    'マイルストーンの追跡',
+                    'レポートの生成'
+                ]
+            },
+
+            // 移行と転送
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'Application Discovery Service',
+                title: 'AWS Application Discovery Service',
+                description: 'オンプレミスアプリケーションの検出と評価。',
+                details: [
+                    'サーバーの使用状況データ収集',
+                    '依存関係のマッピング',
+                    'エージェントベースとエージェントレス',
+                    'Migration Hubとの統合',
+                    'TCO分析のためのデータ'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'Application Migration Service',
+                title: 'AWS Application Migration Service',
+                description: 'アプリケーションの移行を簡素化するサービス。',
+                details: [
+                    'リフト＆シフト移行',
+                    '継続的なレプリケーション',
+                    'カットオーバーウィンドウの最小化',
+                    'テスト環境での検証',
+                    '物理、仮想、クラウドサーバーのサポート'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'AWS DMS',
+                title: 'AWS Database Migration Service',
+                description: 'データベースの移行サービス。',
+                details: [
+                    '同種および異種データベース移行',
+                    '継続的なレプリケーション',
+                    'スキーマ変換（SCTとの連携）',
+                    'ダウンタイムの最小化',
+                    'CDC（変更データキャプチャ）'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'Migration Evaluator',
+                title: 'Migration Evaluator',
+                description: '移行計画のためのビジネスケース作成。',
+                details: [
+                    'オンプレミスのリソース分析',
+                    'TCO（総所有コスト）の比較',
+                    '適正サイズの推奨',
+                    '移行シナリオのモデリング',
+                    'ビジネスケースレポート'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'AWS Migration Hub',
+                title: 'AWS Migration Hub',
+                description: '移行の進行状況を追跡する中央ハブ。',
+                details: [
+                    '移行の一元的な追跡',
+                    '複数の移行ツールとの統合',
+                    '進捗状況の可視化',
+                    'アプリケーショングループ',
+                    '移行戦略の推奨'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'AWS SCT',
+                title: 'AWS Schema Conversion Tool',
+                description: 'データベーススキーマの変換ツール。',
+                details: [
+                    '異種データベース間のスキーマ変換',
+                    '評価レポート',
+                    'コード変換（ストアドプロシージャなど）',
+                    'DMSとの統合',
+                    'データウェアハウスの移行サポート'
+                ]
+            },
+            {
+                category: 'migration',
+                categoryName: '移行と転送',
+                name: 'AWS Snow Family',
+                title: 'AWS Snow Family',
+                description: '物理デバイスによるデータ移行サービス。',
+                details: [
+                    'Snowcone：8TB、エッジコンピューティング',
+                    'Snowball Edge：80TB、エッジコンピューティング',
+                    'Snowmobile：100PB、データセンター規模',
+                    '暗号化とチェーン・オブ・カストディ',
+                    'オフラインデータ転送'
+                ]
+            },
+
+            // ネットワークとコンテンツ配信
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'Amazon API Gateway',
+                title: 'Amazon API Gateway',
+                description: 'APIの作成、公開、保守、監視、保護。',
+                details: [
+                    'REST APIとWebSocket API',
+                    'スロットリングとクォータ',
+                    'APIキーと使用量プラン',
+                    'カスタムドメイン',
+                    'Lambda、EC2、その他のサービスとの統合'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'Amazon CloudFront',
+                title: 'Amazon CloudFront',
+                description: 'グローバルコンテンツ配信ネットワーク（CDN）。',
+                details: [
+                    '400以上のエッジロケーション',
+                    '静的・動的コンテンツの配信',
+                    'HTTPS対応',
+                    'リアルタイムログ',
+                    'Lambda@Edgeによるカスタマイズ'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'AWS Direct Connect',
+                title: 'AWS Direct Connect',
+                description: 'オンプレミスからAWSへの専用ネットワーク接続。',
+                details: [
+                    '1Gbpsから100Gbpsの接続',
+                    '一貫したネットワークパフォーマンス',
+                    '仮想インターフェイス（VIF）',
+                    'BGPルーティング',
+                    'Direct Connect Gateway'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'AWS Global Accelerator',
+                title: 'AWS Global Accelerator',
+                description: 'グローバルアプリケーションの可用性とパフォーマンスを向上。',
+                details: [
+                    '静的IPアドレス（Anycast）',
+                    '最適なエンドポイントへのルーティング',
+                    'ヘルスチェック',
+                    'DDoS保護',
+                    'クライアントアフィニティ'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'AWS PrivateLink',
+                title: 'AWS PrivateLink',
+                description: 'VPC内でサービスをプライベートに接続。',
+                details: [
+                    'インターネットを経由しない接続',
+                    'VPCエンドポイント',
+                    'サービスプロバイダーとコンシューマー',
+                    'NLBとの統合',
+                    'クロスアカウントアクセス'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'Amazon Route 53',
+                title: 'Amazon Route 53',
+                description: '高可用性でスケーラブルなDNSウェブサービス。',
+                details: [
+                    'ドメイン登録',
+                    'DNSルーティング',
+                    'ヘルスチェック',
+                    'トラフィックポリシー',
+                    'プライベートDNS（VPC用）'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'AWS Transit Gateway',
+                title: 'AWS Transit Gateway',
+                description: 'VPCとオンプレミスネットワークを接続するハブ。',
+                details: [
+                    '数千のVPCを接続',
+                    'ルートテーブル',
+                    'マルチキャスト',
+                    'VPN接続',
+                    'Direct Connect Gateway接続'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'Amazon VPC',
+                title: 'Amazon Virtual Private Cloud',
+                description: 'AWS内に論理的に分離されたネットワーク。',
+                details: [
+                    'サブネット（パブリック/プライベート）',
+                    'ルートテーブル',
+                    'インターネットゲートウェイとNATゲートウェイ',
+                    'セキュリティグループとネットワークACL',
+                    'VPCピアリング'
+                ]
+            },
+            {
+                category: 'network',
+                categoryName: 'ネットワークとコンテンツ配信',
+                name: 'AWS VPN',
+                title: 'AWS Virtual Private Network',
+                description: 'セキュアなネットワーク接続ソリューション。',
+                details: [
+                    'Site-to-Site VPN：オンプレミスとの接続',
+                    'Client VPN：リモートアクセス',
+                    'IPsec暗号化',
+                    '冗長性オプション',
+                    'CloudHubによるサイト間接続'
+                ]
+            },
+
+            // セキュリティ、アイデンティティ、コンプライアンス
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Artifact',
+                title: 'AWS Artifact',
+                description: 'コンプライアンスレポートへのオンデマンドアクセス。',
+                details: [
+                    '監査レポート（SOC、PCI、ISO等）',
+                    '契約書（BAA、NDA等）',
+                    'セルフサービスポータル',
+                    'レポートのダウンロード',
+                    'コンプライアンスの証明'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Audit Manager',
+                title: 'AWS Audit Manager',
+                description: '監査の準備を継続的に行うサービス。',
+                details: [
+                    'コンプライアンスフレームワーク',
+                    '証拠の自動収集',
+                    'カスタムフレームワーク',
+                    '評価レポート',
+                    '監査準備の簡素化'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Certificate Manager',
+                title: 'AWS Certificate Manager (ACM)',
+                description: 'SSL/TLS証明書のプロビジョニングと管理。',
+                details: [
+                    'パブリックおよびプライベート証明書',
+                    '自動更新',
+                    'ワイルドカード証明書',
+                    'CloudFront、ELB、API Gatewayとの統合',
+                    '追加料金なし（統合サービス使用時）'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS CloudHSM',
+                title: 'AWS CloudHSM',
+                description: 'ハードウェアセキュリティモジュール。',
+                details: [
+                    'FIPS 140-2レベル3認定',
+                    '専用ハードウェア',
+                    '暗号鍵の生成と保管',
+                    'カスタムアプリケーション',
+                    'クラスター構成による高可用性'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'Amazon Cognito',
+                title: 'Amazon Cognito',
+                description: 'ユーザー認証とアクセス制御。',
+                details: [
+                    'ユーザープール：認証',
+                    'IDプール：認可',
+                    'ソーシャルIDプロバイダー',
+                    'SAML/OIDC連携',
+                    'MFAとアダプティブ認証'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'Amazon Detective',
+                title: 'Amazon Detective',
+                description: 'セキュリティ調査の分析サービス。',
+                details: [
+                    'セキュリティイベントの分析',
+                    'ビジュアル調査',
+                    'GuardDuty、Security Hub、CloudTrailとの統合',
+                    '機械学習による異常検出',
+                    'インタラクティブなグラフ'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Directory Service',
+                title: 'AWS Directory Service',
+                description: 'マネージドMicrosoft Active Directory。',
+                details: [
+                    'AWS Managed Microsoft AD',
+                    'Simple AD',
+                    'AD Connector',
+                    'オンプレミスADとの統合',
+                    'MFAとアクセス制御'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Firewall Manager',
+                title: 'AWS Firewall Manager',
+                description: 'ファイアウォールルールの一元管理。',
+                details: [
+                    'WAF、Shield Advanced、VPCセキュリティグループの管理',
+                    'Organizations全体へのポリシー適用',
+                    '自動修復',
+                    'コンプライアンスレポート',
+                    'クロスアカウント管理'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'Amazon GuardDuty',
+                title: 'Amazon GuardDuty',
+                description: 'インテリジェント脅威検出サービス。',
+                details: [
+                    '機械学習による異常検出',
+                    'VPCフローログ、DNSログ、CloudTrailの分析',
+                    '継続的なモニタリング',
+                    '脅威インテリジェンスフィード',
+                    'EventBridgeとの統合'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS IAM',
+                title: 'AWS Identity and Access Management',
+                description: 'AWSリソースへのアクセスを安全に管理。',
+                details: [
+                    'ユーザー、グループ、ロール',
+                    'ポリシーによる細かい権限制御',
+                    'MFA（多要素認証）',
+                    '一時的な認証情報',
+                    'クロスアカウントアクセス'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'IAM Identity Center',
+                title: 'AWS IAM Identity Center',
+                description: '複数のAWSアカウントとアプリケーションへのシングルサインオン。',
+                details: [
+                    '旧AWS Single Sign-On',
+                    '一元的なアクセス管理',
+                    'SAML 2.0対応',
+                    '既存のIDプロバイダーとの統合',
+                    'アクセス許可セット'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'Amazon Inspector',
+                title: 'Amazon Inspector',
+                description: '自動化されたセキュリティ評価サービス。',
+                details: [
+                    'EC2とコンテナの脆弱性スキャン',
+                    'ネットワーク到達可能性',
+                    'CVEデータベース',
+                    '継続的なスキャン',
+                    'Security Hubとの統合'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS KMS',
+                title: 'AWS Key Management Service',
+                description: '暗号化キーの作成と管理。',
+                details: [
+                    'カスタマーマスターキー（CMK）',
+                    'エンベロープ暗号化',
+                    'キーローテーション',
+                    'きめ細かなアクセス制御',
+                    '多くのAWSサービスとの統合'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'Amazon Macie',
+                title: 'Amazon Macie',
+                description: '機密データの検出と保護。',
+                details: [
+                    'S3バケットのスキャン',
+                    'PII、PHI、財務データの検出',
+                    '機械学習による分類',
+                    'データプライバシーとコンプライアンス',
+                    'カスタムデータ識別子'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS RAM',
+                title: 'AWS Resource Access Manager',
+                description: 'AWSリソースの安全な共有。',
+                details: [
+                    'アカウント間でのリソース共有',
+                    'Organizations内での共有',
+                    'VPCサブネット、Transit Gateway等',
+                    'きめ細かなアクセス許可',
+                    'リソース共有の招待と承認'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Secrets Manager',
+                title: 'AWS Secrets Manager',
+                description: 'シークレットのライフサイクル管理。',
+                details: [
+                    'データベース認証情報の管理',
+                    '自動ローテーション',
+                    'きめ細かなアクセス制御',
+                    'クロスアカウントアクセス',
+                    'CloudFormationとの統合'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Security Hub',
+                title: 'AWS Security Hub',
+                description: 'セキュリティの一元的な表示と管理。',
+                details: [
+                    'セキュリティ標準の自動チェック',
+                    '複数のアカウントとリージョン',
+                    'サードパーティ製品との統合',
+                    '優先順位付けされた検出結果',
+                    'カスタムインサイト'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS Shield',
+                title: 'AWS Shield',
+                description: 'DDoS保護サービス。',
+                details: [
+                    'Shield Standard：自動DDoS保護（無料）',
+                    'Shield Advanced：高度な保護',
+                    '24時間365日のDRTサポート（Advanced）',
+                    'コスト保護（Advanced）',
+                    'リアルタイム通知とレポート'
+                ]
+            },
+            {
+                category: 'security',
+                categoryName: 'セキュリティ',
+                name: 'AWS WAF',
+                title: 'AWS Web Application Firewall',
+                description: 'ウェブアプリケーションファイアウォール。',
+                details: [
+                    'SQLインジェクション、XSS対策',
+                    'IPアドレス、地理的位置、HTTPヘッダーによるフィルタリング',
+                    'レート制限',
+                    'マネージドルールグループ',
+                    'ログとメトリクス'
+                ]
+            },
+
+            // サーバーレス
+            {
+                category: 'serverless',
+                categoryName: 'サーバーレス',
+                name: 'AWS Fargate',
+                title: 'AWS Fargate',
+                description: 'サーバーレスコンテナ実行環境。',
+                details: [
+                    'サーバー管理不要',
+                    'ECSとEKSの両方で使用可能',
+                    'タスクレベルでのリソース指定',
+                    'ネイティブVPC統合',
+                    '使用したリソースに対する課金'
+                ]
+            },
+            {
+                category: 'serverless',
+                categoryName: 'サーバーレス',
+                name: 'AWS Lambda',
+                title: 'AWS Lambda',
+                description: 'サーバーレスコンピューティングサービス。',
+                details: [
+                    'イベント駆動型実行',
+                    '自動スケーリング',
+                    '15分までの実行時間',
+                    '多数のプログラミング言語サポート',
+                    '100ミリ秒単位の課金'
+                ]
+            },
+
+            // ストレージ
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'AWS Backup',
+                title: 'AWS Backup',
+                description: '一元化されたバックアップサービス。',
+                details: [
+                    '複数のAWSサービスのバックアップ',
+                    'バックアップポリシー',
+                    'クロスリージョンバックアップ',
+                    'ライフサイクル管理',
+                    'バックアップボルト（WORM）'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Amazon EBS',
+                title: 'Amazon Elastic Block Store',
+                description: 'EC2用の永続的ブロックストレージ。',
+                details: [
+                    'gp3、gp2、io2、io1、st1、sc1ボリュームタイプ',
+                    'スナップショット',
+                    '暗号化',
+                    'マルチアタッチ（io1/io2）',
+                    'Elastic Volumes（サイズ変更）'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Amazon EFS',
+                title: 'Amazon Elastic File System',
+                description: 'フルマネージドNFSファイルシステム。',
+                details: [
+                    '複数のEC2インスタンスから同時アクセス',
+                    'ペタバイト規模まで自動拡張',
+                    'Standard、Infrequent Accessストレージクラス',
+                    'ライフサイクル管理',
+                    'スループットモード'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Elastic Disaster Recovery',
+                title: 'AWS Elastic Disaster Recovery',
+                description: 'ディザスタリカバリサービス。',
+                details: [
+                    '継続的なレプリケーション',
+                    '秒単位のRPO',
+                    '分単位のRTO',
+                    'ドリルとフェイルバック',
+                    'コスト効率的なDR'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Amazon FSx',
+                title: 'Amazon FSx',
+                description: 'フルマネージドファイルシステム。',
+                details: [
+                    'FSx for Windows File Server',
+                    'FSx for Lustre（高性能コンピューティング）',
+                    'FSx for NetApp ONTAP',
+                    'FSx for OpenZFS',
+                    'ネイティブプロトコルサポート'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Amazon S3',
+                title: 'Amazon Simple Storage Service',
+                description: 'オブジェクトストレージサービス。',
+                details: [
+                    '99.999999999%（11個の9）の耐久性',
+                    'Standard、Standard-IA、One Zone-IA、Glacier等のクラス',
+                    'ライフサイクルポリシー',
+                    'バージョニングとレプリケーション',
+                    'S3 Transfer Acceleration'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'Amazon S3 Glacier',
+                title: 'Amazon S3 Glacier',
+                description: '長期アーカイブストレージ。',
+                details: [
+                    'Glacier Instant Retrieval：ミリ秒単位',
+                    'Glacier Flexible Retrieval：分〜時間',
+                    'Glacier Deep Archive：12時間以内',
+                    'ボルトロックによる変更不可',
+                    '非常に低コスト'
+                ]
+            },
+            {
+                category: 'storage',
+                categoryName: 'ストレージ',
+                name: 'AWS Storage Gateway',
+                title: 'AWS Storage Gateway',
+                description: 'ハイブリッドクラウドストレージ。',
+                details: [
+                    'ファイルゲートウェイ（NFS/SMB）',
+                    'ボリュームゲートウェイ（iSCSI）',
+                    'テープゲートウェイ（VTL）',
+                    'ローカルキャッシュ',
+                    'AWSストレージとのシームレスな統合'
+                ]
+            },
+
+            // クラウドの概念
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: '責任共有モデル',
+                title: 'AWS責任共有モデル',
+                description: 'AWSとお客様の間でセキュリティと運用の責任を分担。',
+                details: [
+                    'AWS：クラウドのセキュリティ（インフラ）',
+                    'お客様：クラウド内のセキュリティ（データ、アプリ）',
+                    'マネージドサービスではAWSの責任が増加',
+                    'IaaS、PaaS、SaaSで責任範囲が変化',
+                    'コンプライアンスは共同責任'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: 'Well-Architected',
+                title: 'AWS Well-Architectedフレームワーク',
+                description: 'クラウドアーキテクチャのベストプラクティス。',
+                details: [
+                    '運用上の優秀性',
+                    'セキュリティ',
+                    '信頼性',
+                    'パフォーマンス効率',
+                    'コスト最適化',
+                    '持続可能性'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: 'クラウドの利点',
+                title: 'AWSクラウドの6つの利点',
+                description: 'オンプレミスと比較したクラウドの主要な利点。',
+                details: [
+                    '資本的支出から変動費への移行',
+                    '大規模な経済によるメリット',
+                    'キャパシティ予測が不要',
+                    '速度と俊敏性の向上',
+                    'データセンターの運用・保守が不要',
+                    '数分でグローバル展開'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: '料金モデル',
+                title: 'AWS料金モデル',
+                description: '従量課金制を基本とした柔軟な料金体系。',
+                details: [
+                    '使用した分だけ支払い',
+                    '前払いなし、解約料なし',
+                    'ボリュームディスカウント',
+                    'リザーブドインスタンス：1年/3年契約で割引',
+                    'Savings Plans：柔軟な割引プラン'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: 'グローバルインフラ',
+                title: 'AWSグローバルインフラストラクチャ',
+                description: 'AWSの世界規模のインフラストラクチャ。',
+                details: [
+                    'リージョン：地理的に分離された領域',
+                    'アベイラビリティーゾーン（AZ）：独立したデータセンター',
+                    'ローカルゾーン：大都市近郊の拡張',
+                    'エッジロケーション：CDN配信ポイント',
+                    'Wavelength：5Gネットワーク内のコンピューティング'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: 'AWS CAF',
+                title: 'AWS Cloud Adoption Framework',
+                description: 'クラウド導入のためのガイダンス。',
+                details: [
+                    'ビジネス視点：ビジネス価値の実現',
+                    '人材視点：組織の変革',
+                    'ガバナンス視点：リスクとコンプライアンス',
+                    'プラットフォーム視点：クラウドインフラ',
+                    'セキュリティ視点：保護とコンプライアンス',
+                    'オペレーション視点：ワークロードの実行'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: '移行戦略（6R）',
+                title: 'クラウド移行の6つの戦略',
+                description: 'アプリケーション移行のアプローチ。',
+                details: [
+                    'Rehost（リフト＆シフト）：そのまま移行',
+                    'Replatform：一部最適化して移行',
+                    'Repurchase：SaaSへの切り替え',
+                    'Refactor：アーキテクチャ変更',
+                    'Retire：廃止',
+                    'Retain：現状維持'
+                ]
+            },
+            {
+                category: 'concepts',
+                categoryName: 'クラウドの概念',
+                name: 'サポートプラン',
+                title: 'AWSサポートプラン',
+                description: '様々なレベルの技術サポート。',
+                details: [
+                    'ベーシック：無料、フォーラムとドキュメント',
+                    'デベロッパー：営業時間内サポート、12時間応答',
+                    'ビジネス：24時間365日、1時間応答',
+                    'エンタープライズOn-Ramp：30分応答、プールTAM',
+                    'エンタープライズ：15分応答、専任TAM'
+                ]
+            }
+        ];
+
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        let filteredCards = [...cards];
+
+        const flashcard = document.getElementById('flashcard');
+        const serviceName = document.getElementById('serviceName');
+        const serviceCategory = document.getElementById('serviceCategory');
+        const cardBack = document.getElementById('cardBack');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const cardNumber = document.getElementById('cardNumber');
+        const totalCards = document.getElementById('totalCards');
+        const progressBar = document.getElementById('progressBar');
+        const categorySelect = document.getElementById('categorySelect');
+        const searchInput = document.getElementById('searchInput');
+        const totalServicesCount = document.getElementById('totalServicesCount');
+
+        totalServicesCount.textContent = cards.length;
+
+        function updateCard() {
+            if (filteredCards.length === 0) {
+                serviceName.textContent = '該当するカードがありません';
+                serviceCategory.textContent = '';
+                cardBack.innerHTML = '<p>検索条件を変更してください。</p>';
+                prevBtn.disabled = true;
+                nextBtn.disabled = true;
+                return;
+            }
+
+            const card = filteredCards[currentCardIndex];
+            serviceName.textContent = card.name;
+            serviceCategory.textContent = card.categoryName;
+            
+            let backContent = `
+                <h3>${card.title}</h3>
+                <p>${card.description}</p>
+                <ul>
+            `;
+            
+            card.details.forEach(detail => {
+                backContent += `<li>${detail}</li>`;
+            });
+            
+            backContent += '</ul>';
+            cardBack.innerHTML = backContent;
+            
+            cardNumber.textContent = currentCardIndex + 1;
+            totalCards.textContent = filteredCards.length;
+            
+            const progress = ((currentCardIndex + 1) / filteredCards.length) * 100;
+            progressBar.style.width = progress + '%';
+            
+            prevBtn.disabled = currentCardIndex === 0;
+            nextBtn.disabled = currentCardIndex === filteredCards.length - 1;
+            
+            if (isFlipped) {
+                flashcard.classList.remove('flipped');
+                isFlipped = false;
+            }
+        }
+
+        function filterCards() {
+            const category = categorySelect.value;
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            filteredCards = cards.filter(card => {
+                const categoryMatch = category === 'all' || card.category === category;
+                const searchMatch = !searchTerm || 
+                    card.name.toLowerCase().includes(searchTerm) ||
+                    card.title.toLowerCase().includes(searchTerm) ||
+                    card.description.toLowerCase().includes(searchTerm);
+                
+                return categoryMatch && searchMatch;
+            });
+            
+            currentCardIndex = 0;
+            updateCard();
+        }
+
+        flashcard.addEventListener('click', () => {
+            if (filteredCards.length > 0) {
+                flashcard.classList.toggle('flipped');
+                isFlipped = !isFlipped;
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentCardIndex < filteredCards.length - 1) {
+                currentCardIndex++;
+                updateCard();
+            }
+        });
+
+        shuffleBtn.addEventListener('click', () => {
+            for (let i = filteredCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+            }
+            currentCardIndex = 0;
+            updateCard();
+        });
+
+        categorySelect.addEventListener('change', filterCards);
+        searchInput.addEventListener('input', filterCards);
+
+        // キーボードショートカット
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCard();
+            } else if (e.key === 'ArrowRight' && currentCardIndex < filteredCards.length - 1) {
+                currentCardIndex++;
+                updateCard();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                if (filteredCards.length > 0) {
+                    flashcard.classList.toggle('flipped');
+                    isFlipped = !isFlipped;
+                }
+            }
+        });
+
+        // 初期表示
+        updateCard();
+    </script>
+</body>
+</html>
