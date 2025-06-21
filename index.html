@@ -2529,7 +2529,7 @@
           100
         ).toFixed(1);
 
-        const text = `AWS クラウドプラクティショナー学習進捗\n\n🎯 全体の学習率: ${overallKnowPercent}%\n✅ 知ってる: ${stats.overall.know}/${stats.overall.total}\n❓ 曖昧: ${stats.overall.unclear}\n❌ 知らない: ${stats.overall.unknown}\n\n#AWS #CloudPractitioner #CloudDeck`;
+        const text = `AWS Cloud Practitioner学習進捗\n\n全体の学習率: ${overallKnowPercent}%\n知ってる: ${stats.overall.know}/${stats.overall.total} (${overallKnowPercent}%)\n曖昧: ${stats.overall.unclear} (${(stats.overall.unclear / stats.overall.total * 100).toFixed(1)}%)\n知らない: ${stats.overall.unknown} (${(stats.overall.unknown / stats.overall.total * 100).toFixed(1)}%)\n\n#AWS #CloudPractitioner #CloudDeck`;
 
         const url =
           "https://twitter.com/intent/tweet?text=" + encodeURIComponent(text);
